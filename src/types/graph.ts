@@ -10,6 +10,7 @@ export type NodeType =
 
 export interface LayerInfo {
   name: string
+  type: string
   in_features?: number
   out_features?: number
   activation?: string

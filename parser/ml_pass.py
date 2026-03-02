@@ -47,8 +47,12 @@ def _extract_layers(class_source: str) -> list[dict]:
         if func_name in ('nn.Linear', 'torch.nn.Linear'):
             args = call.args
             if len(args) >= 2:
-                layer['in_features'] = ast.literal_eval(args[0])
-                layer['out_features'] = ast.literal_eval(args[1])
+                try:
+                    layer['in_features'] = ast.literal_eval(args[0])
+                    layer['out_features'] = ast.literal_eval(args[1])
+                except (ValueError, TypeError):
+                    layer['in_features'] = ast.unparse(args[0])
+                    layer['out_features'] = ast.unparse(args[1])
 
         layers.append(layer)
 

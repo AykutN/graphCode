@@ -1,5 +1,6 @@
 use std::io::Write;
 use std::process::{Command, Stdio};
+use tauri::Manager;
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -7,12 +8,15 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-fn parse_code(source: String) -> Result<String, String> {
+fn parse_code(source: String, app: tauri::AppHandle) -> Result<String, String> {
+    let resource_dir = app.path().resource_dir().map_err(|e| e.to_string())?;
     let payload = serde_json::json!({ "source": source }).to_string();
 
     let mut child = Command::new("python3")
         .arg("-m")
         .arg("parser.main")
+        .current_dir(&resource_dir)
+        .env("PYTHONPATH", &resource_dir)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
